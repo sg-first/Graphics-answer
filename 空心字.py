@@ -34,7 +34,7 @@ def DDA(x0,y0,x1,y1):
     if x0>x1:
         x0,y0,x1,y1=x1,y1,x0,y0
 
-    step=0.01
+    step=0.04
 
     dx=x1-x0
     dy=y1-y0
@@ -47,16 +47,21 @@ def DDA(x0,y0,x1,y1):
         y+=k*step
         x+=step
 
-def drawName(x,y):
+def drawName(x,y,x1,y1):
     d=np.array([x,y])
+    d1=np.array([x1,y1])
     for l1,l2 in allLine:
         l11=l1+d
         l22=l2+d
         DDA(l11[0],l11[1],l22[0],l22[1])
+        l11d=l1+d1
+        l22d=l2+d1
+        DDA(l11d[0],l11d[1],l22d[0],l22d[1])
+        DDA(l11[0],l11[1],l11d[0],l11d[1])
+        DDA(l22[0],l22[1],l22d[0],l22d[1])
 
 def draw():
-    drawName(20, 70)
-    drawName(20, 100)
+    drawName(20, 70, 50, 100)
 
 gui = ti.GUI("Taichi", res=size)
 for frame in range(20000):
