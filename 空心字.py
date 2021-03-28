@@ -1,5 +1,6 @@
 import taichi as ti
 import numpy as np
+import stack
 
 ti.init(arch=ti.gpu) # Try to run on GPU
 size=640
@@ -29,6 +30,7 @@ line2=ti.Matrix(allLine[:,1,:])
 '''
 
 img = np.zeros((size, size))
+boundary_color=0.9
 
 def DDA(x0,y0,x1,y1):
     if x0>x1:
@@ -42,23 +44,76 @@ def DDA(x0,y0,x1,y1):
     y=y0
 
     x=x0
+    allPos=[]
     while x<=x1:
-        img[int(x),size-int(y+0.5)]=1 # y+0.5相当于四舍五入，size-规范化坐标
+        rx=int(x)
+        ry=size-int(y+0.5)
+        img[rx,ry]=boundary_color # y+0.5相当于四舍五入，size-规范化坐标
+        allPos.append((rx,ry))
         y+=k*step
         x+=step
+    return allPos
+
+
+def fill(l11,l11d,l22,l22d):
+    allX=[l11[0],l11d[0],l22[0],l22d[0]]
+    allY=[size-l11[1],size-l11d[1],size-l22[1],size-l22d[1]]
+
+    seed=int((max(allX)+min(allX))/2),int((max(allY)+min(allY))/2)
+
+    s=stack.Stack()
+    s.push(seed)
+    upOver=False
+    while s.size()!=0:
+        x,y=s.pop()
+        savex=x
+        while img[x,y]!=boundary_color:
+            img[x,y]=0.5
+            x+=1
+            if img[x,y+1]==boundary_color or img[x,y-1]==boundary_color:
+                break
+        xright=x-1
+        x=savex-1
+        while img[x,y]!=boundary_color:
+            img[x,y]=0.5
+            x-=1
+            if img[x,y+1]==boundary_color or img[x,y-1]==boundary_color:
+                break
+        xleft=x+1
+
+        if not upOver:
+            y += 1  # 看下一行
+            x = int((xleft + xright) / 2)
+            if img[x, y] != boundary_color and y < max(allY):
+                s.push((x, y))
+            else: # 下面的都处理完了，可以处理上面的
+                upOver=True
+                s.push(seed)
+        else:
+             y -= 1  # 看上一行
+             x = int((xleft + xright) / 2)
+             if img[x, y] != boundary_color and y > min(allY):
+                 s.push((x, y))
+
+def setColor(allPos):
+    for x,y in allPos:
+        img[x,y]=1
 
 def drawName(x,y,x1,y1):
     d=np.array([x,y])
     d1=np.array([x1,y1])
+    aa=0
     for l1,l2 in allLine:
         l11=l1+d
         l22=l2+d
-        DDA(l11[0],l11[1],l22[0],l22[1])
+        allPos=DDA(l11[0],l11[1],l22[0],l22[1])
         l11d=l1+d1
         l22d=l2+d1
-        DDA(l11d[0],l11d[1],l22d[0],l22d[1])
-        DDA(l11[0],l11[1],l11d[0],l11d[1])
-        DDA(l22[0],l22[1],l22d[0],l22d[1])
+        allPos+=DDA(l11d[0],l11d[1],l22d[0],l22d[1])
+        allPos+=DDA(l11[0],l11[1],l11d[0],l11d[1])
+        allPos+=DDA(l22[0],l22[1],l22d[0],l22d[1])
+        fill(l11,l11d,l22,l22d)
+        setColor(allPos)
 
 def draw():
     drawName(20, 70, 50, 100)
