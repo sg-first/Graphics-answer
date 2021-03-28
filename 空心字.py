@@ -69,21 +69,21 @@ def fill(l11,l11d,l22,l22d):
         savex=x
         while img[x,y]!=boundary_color:
             img[x,y]=0.5
-            x+=1
             if img[x,y+1]==boundary_color or img[x,y-1]==boundary_color:
                 break
+            x += 1
         xright=x-1
         x=savex-1
         while img[x,y]!=boundary_color:
             img[x,y]=0.5
-            x-=1
             if img[x,y+1]==boundary_color or img[x,y-1]==boundary_color:
                 break
+            x -= 1
         xleft=x+1
+        x = int((xleft + xright) / 2)
 
         if not upOver:
             y += 1  # 看下一行
-            x = int((xleft + xright) / 2)
             if img[x, y] != boundary_color and y < max(allY):
                 s.push((x, y))
             else: # 下面的都处理完了，可以处理上面的
@@ -91,7 +91,6 @@ def fill(l11,l11d,l22,l22d):
                 s.push(seed)
         else:
              y -= 1  # 看上一行
-             x = int((xleft + xright) / 2)
              if img[x, y] != boundary_color and y > min(allY):
                  s.push((x, y))
 
@@ -102,7 +101,6 @@ def setColor(allPos):
 def drawName(x,y,x1,y1):
     d=np.array([x,y])
     d1=np.array([x1,y1])
-    aa=0
     for l1,l2 in allLine:
         l11=l1+d
         l22=l2+d
