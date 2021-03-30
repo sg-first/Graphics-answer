@@ -58,7 +58,7 @@ def bresenham(x0, y0, x1, y1):
             x += k*step
     return allPos
 
-
+fill_Color=0.5
 def fill(l11,l11d,l22,l22d):
     allX=[l11[0],l11d[0],l22[0],l22d[0]]
     allY=[size-l11[1],size-l11d[1],size-l22[1],size-l22d[1]]
@@ -72,14 +72,14 @@ def fill(l11,l11d,l22,l22d):
         x,y=s.pop()
         savex=x
         while img[x,y]!=boundary_color:
-            img[x,y]=0.5
+            img[x,y]=fill_Color
             if img[x,y+1]==boundary_color or img[x,y-1]==boundary_color:
                 break
             x += 1
         xright=x-1
         x=savex-1
         while img[x,y]!=boundary_color:
-            img[x,y]=0.5
+            img[x,y]=fill_Color
             if img[x,y+1]==boundary_color or img[x,y-1]==boundary_color:
                 break
             x -= 1
@@ -98,9 +98,10 @@ def fill(l11,l11d,l22,l22d):
              if img[x, y] != boundary_color and y > min(allY):
                  s.push((x, y))
 
+bou_Color=1
 def setColor(allPos):
     for x,y in allPos:
-        img[x,y]=1
+        img[x,y]=bou_Color
 
 def drawName(x,y,x1,y1):
     d=np.array([x,y])
@@ -117,8 +118,30 @@ def drawName(x,y,x1,y1):
         fill(l11,l11d,l22,l22d)
         setColor(allPos)
 
+dire=True
+def colorChange():
+    global fill_Color, dire
+    if dire:
+        fill_Color-=0.1
+    else:
+        fill_Color+=0.1
+    if fill_Color==0.9:
+        if dire:
+            fill_Color=0.8
+        else:
+            fill_Color=1
+    elif fill_Color<=0:
+        dire=False
+    elif fill_Color>=1:
+        dire=True
+
 gui = ti.GUI("Taichi", res=size)
-for frame in range(20000):
+frame=30
+while True:
     drawName(20, 70, 50, 100)
+    frame-=1
+    if frame==0:
+        frame=1
+        colorChange()
     gui.set_image(img)
     gui.show() # Change to gui.show(f'{frame:06d}.png') to write images to disk
