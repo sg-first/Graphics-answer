@@ -6,7 +6,7 @@ ti.init(arch=ti.gpu) # Try to run on GPU
 size=640
 
 # 名字的线
-startPos=[160,116]
+startPos=[150,80]
 allLine=[]
 
 allLine.append([[160,116],[266,107]])
@@ -22,6 +22,12 @@ allLine.append([[289,242],[436,238]])
 allLine=np.array(allLine)
 startPos=np.array(startPos)
 allLine=allLine-startPos
+
+# 进行坐标变换
+transMat=np.array([[1.5,0],[0,2]])
+for i in allLine:
+    i[0] = np.dot(i[0], transMat)
+    i[1] = np.dot(i[1], transMat)
 
 img = np.zeros((size, size))
 boundary_color=0.9
@@ -138,7 +144,7 @@ def colorChange():
 gui = ti.GUI("Taichi", res=size)
 frame=30
 while True:
-    drawName(20, 70, 50, 100)
+    drawName(0, 0, 20, 20)
     frame-=1
     if frame==0:
         frame=1
