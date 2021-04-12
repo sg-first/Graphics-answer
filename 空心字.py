@@ -1,9 +1,10 @@
 import taichi as ti
 import numpy as np
 import stack
+import math
 
 ti.init(arch=ti.gpu) # Try to run on GPU
-size=640
+size=1000
 
 # 名字的线
 startPos=[150,80]
@@ -23,12 +24,6 @@ allLine=np.array(allLine)
 startPos=np.array(startPos)
 allLine=allLine-startPos
 
-# 进行坐标变换
-transMat=np.array([[1.5,0],[0,2]])
-for i in allLine:
-    i[0] = np.dot(i[0], transMat)
-    i[1] = np.dot(i[1], transMat)
-
 img = np.zeros((size, size))
 boundary_color=0.9
 
@@ -39,7 +34,7 @@ def bresenham(x0, y0, x1, y1):
     dx=x1-x0
     dy=y1-y0
     k=dy/dx
-    step=0.7
+    step=0.1
 
     y=y0
     x=x0
@@ -109,15 +104,15 @@ def setColor(allPos):
     for x,y in allPos:
         img[x,y]=bou_Color
 
-def drawName(x,y,x1,y1):
+def drawName(x,y,x1,y1,allLine):
     d=np.array([x,y])
     d1=np.array([x1,y1])
     for l1,l2 in allLine:
         l11=l1+d
         l22=l2+d
         allPos=bresenham(l11[0], l11[1], l22[0], l22[1])
-        l11d=l1+d1
-        l22d=l2+d1
+        l11d=l11+d1
+        l22d=l22+d1
         allPos+=bresenham(l11d[0], l11d[1], l22d[0], l22d[1])
         allPos+=bresenham(l11[0], l11[1], l11d[0], l11d[1])
         allPos+=bresenham(l22[0], l22[1], l22d[0], l22d[1])
@@ -141,13 +136,31 @@ def colorChange():
     elif fill_Color>=1:
         dire=True
 
+def trans(allLine, transMat):
+    newLine=allLine.copy()
+    for i in newLine:
+        i[0] = np.dot(i[0], transMat)
+        i[1] = np.dot(i[1], transMat)
+    return newLine
+
+shear=np.array([[1,0.3],[0.2,1]])
+scale=np.array([[1.5,0],[0,2]])
+rotate=np.array([[math.cos(30),-math.sin(30)],[math.sin(30),math.cos(30)]])
+shearPos=trans(allLine,shear)
+scalePos=trans(allLine,scale)
+rotatePos=trans(allLine,rotate)
+
 gui = ti.GUI("Taichi", res=size)
 frame=30
 while True:
-    drawName(0, 0, 20, 20)
+    drawName(0, 0, 20, 20, shearPos)
+    drawName(250, 0, 20, 20, scalePos)
+    drawName(250, 250, 20, 20, rotatePos)
+    '''
     frame-=1
     if frame==0:
         frame=1
         colorChange()
+    '''
     gui.set_image(img)
     gui.show() # Change to gui.show(f'{frame:06d}.png') to write images to disk
