@@ -63,15 +63,11 @@ allPos=[[(-1,-1,-1),(-1,-0.5,-1),(-1,0,-1),(-1,0.5,-1),(-1,1,-1)],
         [(0.7,-1,1),(0.7,-0.5,1),(0.7,0,1),(0.7,0.5,1),(0.7,1,1)]]
 x_matrix, y_matrix, z_matrix = solve(allPos)
 
-# 绘制
-def draw():
-    interact.drawInit()
-
-    a=0.1
-    b=0.1
-    glBegin(GL_QUADS)
-    for i in range(9):
-        for j in range(9):
+def drawSurface(x_matrix, y_matrix, z_matrix):
+    a = 0.1
+    b = 0.1
+    for i in range(x_matrix.shape[0]-1):
+        for j in range(x_matrix.shape[1]-1):
             glColor3f(a, b, 0)
             glVertex3f(x_matrix[i,j], y_matrix[i,j], z_matrix[i,j])
             glVertex3f(x_matrix[i+1,j], y_matrix[i+1,j], z_matrix[i+1,j])
@@ -79,8 +75,13 @@ def draw():
             glVertex3f(x_matrix[i,j+1], y_matrix[i,j+1], z_matrix[i,j+1])
             b+=0.1
         a+=0.1
-    glEnd()
 
+# 绘制
+def draw():
+    interact.drawInit()
+    glBegin(GL_QUADS)
+    drawSurface(x_matrix, y_matrix, z_matrix)
+    glEnd()
     glutSwapBuffers()  # 切换缓冲区，以显示绘制内容
 
 
