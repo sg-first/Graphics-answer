@@ -30,7 +30,7 @@ z_control_point_matrix = np.array([
     [ 0.84124974,  0.84124974,  0.84124974,  0.84124974]
 ])
 
-def solve(x_control_point_matrix, y_control_point_matrix, z_control_point_matrix):
+def solve(x_control_point_matrix, y_control_point_matrix, z_control_point_matrix,step=10):
     # 阶
     assert(x_control_point_matrix.shape == y_control_point_matrix.shape == z_control_point_matrix.shape)
     control_point_u_dimension = x_control_point_matrix.shape[0]
@@ -39,8 +39,8 @@ def solve(x_control_point_matrix, y_control_point_matrix, z_control_point_matrix
     v_order = control_point_v_dimension - 1
 
     # uv空间参数
-    u_vector = np.linspace(0, 1.0, num=100)
-    v_vector = np.linspace(0, 1.0, num=100)
+    u_vector = np.linspace(0, 1.0, num=step)
+    v_vector = np.linspace(0, 1.0, num=step)
 
     # 计算matrices
     u_bernstein_matrix = np.zeros(shape=(control_point_u_dimension, u_vector.size))
@@ -63,21 +63,26 @@ def solve(x_control_point_matrix, y_control_point_matrix, z_control_point_matrix
 
 x_matrix, y_matrix, z_matrix = solve(x_control_point_matrix, y_control_point_matrix, z_control_point_matrix)
 
-x_matrix=x_matrix.reshape((10000,))
-y_matrix=y_matrix.reshape((10000,))
-z_matrix=z_matrix.reshape((10000,))
+x_matrix-=x_matrix.mean()
+y_matrix-=y_matrix.mean()
+z_matrix-=z_matrix.mean()
 
 # 绘制
 def draw():
     interact.drawInit()
 
-    # 设置点大小
-    glPointSize(3)
-    # 只绘制端点
-    glBegin(GL_POINTS)
-    glColor3f(0.0, 1.0, 0.0)
-    for i in range(10000):
-        glVertex3f(x_matrix[i], y_matrix[i], z_matrix[i])
+    a=0.1
+    b=0.1
+    glBegin(GL_QUADS)
+    for i in range(9):
+        for j in range(9):
+            glColor3f(a, b, 0)
+            glVertex3f(x_matrix[i,j], y_matrix[i,j], z_matrix[i,j])
+            glVertex3f(x_matrix[i+1,j], y_matrix[i+1,j], z_matrix[i+1,j])
+            glVertex3f(x_matrix[i+1,j+1], y_matrix[i+1,j+1], z_matrix[i+1,j+1])
+            glVertex3f(x_matrix[i,j+1], y_matrix[i,j+1], z_matrix[i,j+1])
+            b+=0.1
+        a+=0.1
     glEnd()
 
     glutSwapBuffers()  # 切换缓冲区，以显示绘制内容
