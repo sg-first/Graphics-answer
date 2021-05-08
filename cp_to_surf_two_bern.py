@@ -8,29 +8,25 @@ import interact
 def compute_bernstein_value(order, control_point_index, t):
     return comb(order, control_point_index) * t ** control_point_index * (1.0 - t) ** (order - control_point_index)
 
-# 控制点
-x_control_point_matrix = np.array([
-    [2.99846590, 3.00844079, 2.47012264, 1.61960384],
-    [3.00179002, 3.01177595, 2.47286102, 1.62139934],
-    [2.82239653, 2.83178568, 2.32507747, 1.52450099],
-    [2.53896277, 2.54740903, 2.09158602, 1.37140590]
-])
+def solve(allPos,step=10):
+    x_control_point_matrix=[]
+    y_control_point_matrix=[]
+    z_control_point_matrix=[]
+    for i in allPos: # 每根样条线
+        xarr=[]
+        yarr=[]
+        zarr=[]
+        for x,y,z in i:
+            xarr.append(x)
+            yarr.append(y)
+            zarr.append(z)
+        x_control_point_matrix.append(xarr)
+        y_control_point_matrix.append(yarr)
+        z_control_point_matrix.append(zarr)
+    x_control_point_matrix = np.array(x_control_point_matrix)
+    y_control_point_matrix = np.array(y_control_point_matrix)
+    z_control_point_matrix = np.array(z_control_point_matrix)
 
-y_control_point_matrix = np.array([
-    [-0.00056355, 1.00378404, 1.98916880, 2.52342656],
-    [-0.00056417, 1.00489684, 1.99137400, 2.52622403],
-    [-0.00053046, 0.94484202, 1.87236516, 2.37525140],
-    [-0.00047719, 0.84995807, 1.68433648, 2.13672133]
-])
-
-z_control_point_matrix = np.array([
-    [-0.00018787, -0.00018787, -0.00018787, -0.00018787],
-    [ 0.33463746,  0.33463746,  0.33463746,  0.33463746],
-    [ 0.66314105,  0.66314105,  0.66314105,  0.66314105],
-    [ 0.84124974,  0.84124974,  0.84124974,  0.84124974]
-])
-
-def solve(x_control_point_matrix, y_control_point_matrix, z_control_point_matrix,step=10):
     # 阶
     assert(x_control_point_matrix.shape == y_control_point_matrix.shape == z_control_point_matrix.shape)
     control_point_u_dimension = x_control_point_matrix.shape[0]
@@ -61,11 +57,11 @@ def solve(x_control_point_matrix, y_control_point_matrix, z_control_point_matrix
 
     return x_matrix, y_matrix, z_matrix
 
-x_matrix, y_matrix, z_matrix = solve(x_control_point_matrix, y_control_point_matrix, z_control_point_matrix)
-
-x_matrix-=x_matrix.mean()
-y_matrix-=y_matrix.mean()
-z_matrix-=z_matrix.mean()
+allPos=[[(-1,-1,-1),(-1,-0.5,-1),(-1,0,-1),(-1,0.5,-1),(-1,1,-1)],
+        [(-0.5,0,-1),(-0.5,0,-0.5),(-0.5,0,0),(-0.5,0,0.5),(-0.5,0,1)],
+        [(0,-1,0),(0,-0.5,0),(0,0,0),(0,0.5,0),(0,1,0)],
+        [(0.7,-1,1),(0.7,-0.5,1),(0.7,0,1),(0.7,0.5,1),(0.7,1,1)]]
+x_matrix, y_matrix, z_matrix = solve(allPos)
 
 # 绘制
 def draw():
