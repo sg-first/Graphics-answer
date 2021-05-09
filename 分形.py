@@ -9,9 +9,11 @@ import copy
 quadric=gluNewQuadric()
 
 class cylinder:
-    def __init__(self,z,angle,width,height,color):
+    def __init__(self,z,angle,width,height,color,layer0=False):
         self.z=z
-        self.angle=angle
+        self.angle = angle
+        if not layer0:
+            self.angle+=180
         self.width=width
         self.height=height
         self.color=color
@@ -46,14 +48,14 @@ def randColor(color):
     else:
         return color
 
-root=cylinder(0,0,0.75,5,[1,1,0])
+root=cylinder(0,0,0.75,5,[1,1,0],True)
 def recuTree(width,height,color,parent=None,layer=0):
     if layer==3:
         return
     newColor=randColor(copy.copy(color))
-    if layer!=0:
+    if layer != 0:
         detZ = height*(random.randint(0, 5)/10)
-        detAngle = 180+random.randint(-60, 60)
+        detAngle = random.randint(-60, 60)
         detWidth = random.randint(4, 8)/10
         detHeight = random.randint(4, 8)/10
         width*=detWidth
