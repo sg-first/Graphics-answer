@@ -9,25 +9,28 @@ import copy
 quadric=gluNewQuadric()
 
 class cylinder:
-    def __init__(self,z,angle,width,height,color,layer0=False):
+    def __init__(self,z,angle,width,height,color):
         self.z=z
         self.angle = angle
-        if not layer0:
-            self.angle+=180
+        print(self.z, self.angle)
         self.width=width
         self.height=height
         self.color=color
         self.subCylinder=[]
 
-    def draw(self):
+    def draw(self,needAdd=False):
+        if needAdd:
+            angle=self.angle+180
+        else:
+            angle=self.angle
+
         glColor3f(self.color[0], self.color[1], self.color[2])
         glTranslatef(0.0, 0, self.z)
-        glRotatef(self.angle, 1, 0, 0)
-        print(self.z,self.angle)
+        glRotatef(angle, 1, 0, 0)
         gluCylinder(quadric, self.width, self.width, self.height, 30, 1)
         for i in self.subCylinder:
-            i.draw()
-        glRotatef(-self.angle, 1, 0, 0)
+            i.draw(not needAdd)
+        glRotatef(-angle, 1, 0, 0)
         glTranslatef(0.0, 0, -self.z)
 
 def randColor(color):
@@ -48,7 +51,7 @@ def randColor(color):
     else:
         return color
 
-root=cylinder(0,0,0.75,5,[1,1,0],True)
+root=cylinder(0,0,0.75,5,[1,1,0])
 def recuTree(width,height,color,parent=None,layer=0):
     if layer==3:
         return
@@ -56,7 +59,7 @@ def recuTree(width,height,color,parent=None,layer=0):
     if layer != 0:
         detZ = height*(random.randint(0, 5)/10)
         detAngle = random.randint(-60, 60)
-        detWidth = random.randint(4, 8)/10
+        detWidth = random.randint(3, 6)/10
         detHeight = random.randint(4, 8)/10
         width*=detWidth
         height*=detHeight
@@ -65,7 +68,7 @@ def recuTree(width,height,color,parent=None,layer=0):
         parent = c
     # 递归
     num=random.randint(3, 10)
-    for _ in range(2):
+    for _ in range(num):
         recuTree(width,height,newColor,parent,layer+1)
 
 recuTree(0.7,5,[1,1,0],root)
@@ -77,7 +80,7 @@ def draw():
     '''
     gluCylinder(quadric, 0.5, 0.5, 3, 30, 1)
     glTranslatef(0.0, 0, 2.5)
-    glRotatef(180-60, 1, 0, 0)
+    glRotatef(-60, 1, 0, 0)
     gluCylinder(quadric, 0.3, 0.3, 2, 30, 1)
     '''
     root.draw()
