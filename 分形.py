@@ -53,7 +53,7 @@ def randColor(color):
     else:
         return color
 
-root=cylinder(0,0,0.75,3,[0.6,0.5,0.2],0,0)
+root=cylinder(0,0,0.2,5,[0.6,0.5,0.2],0,0)
 def recuTree(width,height,color,parent=None,layer=0):
     if layer==5:
         return
@@ -61,9 +61,9 @@ def recuTree(width,height,color,parent=None,layer=0):
     if layer != 0:
         detZ = height*(random.randint(0, 5)/10)
         detAngle = random.randint(-60, 60)
-        detWidth = random.randint(3, 6)/10
+        # detWidth = random.randint(3, 6)/10
         detHeight = random.randint(4, 8)/10
-        width*=detWidth
+        width=0.05
         height*=detHeight
         isX = random.randint(0,1)
         isY = random.randint(0, 1)
