@@ -27,21 +27,22 @@ def solve(allPos,step=10):
     y_control_point_matrix = np.array(y_control_point_matrix)
     z_control_point_matrix = np.array(z_control_point_matrix)
 
-    # 阶
+    # 控制点个数
     assert(x_control_point_matrix.shape == y_control_point_matrix.shape == z_control_point_matrix.shape)
     control_point_u_dimension = x_control_point_matrix.shape[0]
     control_point_v_dimension = y_control_point_matrix.shape[1]
     u_order = control_point_u_dimension - 1
     v_order = control_point_v_dimension - 1
 
-    # uv空间参数
+    # uv空间
     u_vector = np.linspace(0, 1.0, num=step)
     v_vector = np.linspace(0, 1.0, num=step)
 
-    # 计算matrices
+    # 每个控制点对实际uv空间点影响的矩阵
     u_bernstein_matrix = np.zeros(shape=(control_point_u_dimension, u_vector.size))
     v_bernstein_matrix = np.zeros(shape=(control_point_v_dimension, v_vector.size))
 
+    # 计算矩阵每个元素实际值
     for u_control_point_index in range(0, control_point_u_dimension):
         for u_index, u in enumerate(u_vector):
             u_bernstein_matrix[u_control_point_index][u_index] = compute_bernstein_value(u_order, u_control_point_index, u)
@@ -61,7 +62,10 @@ allPos=[[(-1,-1,-1),(-1,-0.5,-1),(-1,0,-1),(-1,0.5,-1),(-1,1,-1)],
         [(-0.5,0,-1),(-0.5,0,-0.5),(-0.5,0,0),(-0.5,0,0.5),(-0.5,0,1)],
         [(0,-1,0),(0,-0.5,0),(0,0,0),(0,0.5,0),(0,1,0)],
         [(0.7,-1,1),(0.7,-0.5,1),(0.7,0,1),(0.7,0.5,1),(0.7,1,1)]]
-x_matrix, y_matrix, z_matrix = solve(allPos)
+x_matrix, y_matrix, z_matrix = solve(allPos,50)
+allPos=[[(0.7,-1,1),(0.7,-0.5,1),(0.7,0,1),(0.7,0.5,1),(0.7,1,1)],
+        [(1,-1,1),(1,-1,1),(1,-1,1),(1,-1,1),(1,-1,1)]]
+x_matrix2, y_matrix2, z_matrix2 = solve(allPos)
 
 def drawSurface(x_matrix, y_matrix, z_matrix):
     a = 0.1
@@ -81,6 +85,7 @@ def draw():
     interact.drawInit()
     glBegin(GL_QUADS)
     drawSurface(x_matrix, y_matrix, z_matrix)
+    drawSurface(x_matrix2, y_matrix2, z_matrix2)
     glEnd()
     glutSwapBuffers()  # 切换缓冲区，以显示绘制内容
 
